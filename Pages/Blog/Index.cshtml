@@ -2,26 +2,35 @@
 @model razorweb.Pages_Blog.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Các bài viết";
+    int i=0;
+    //Submit from get thì sẽ gử value input len querystring
+    // binding vao phuong thuc OnGetAsynce
 }
 
-<h1>Index</h1>
-
+<h1>DANH SÁCH BÀI VIẾT</h1>
+<form method="get" asp-page="./Index">
+<label> Tìm kiếm</label>
+<input name="SearchString" value="">
+ <button type="submit"> Search</button>
+</form>
+<hr>
 <p>
-    <a asp-page="Create">Create New</a>
+    <a asp-page="Create" class="btn btn-primary">Tạo bài viết mới</a>
 </p>
 <table class="table">
     <thead>
         <tr>
+            <th>
+                STT
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Article[0].Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Article[0].Created)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Article[0].Content)
-            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -29,18 +38,19 @@
 @foreach (var item in Model.Article) {
         <tr>
             <td>
+                @(++i)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Created)
             </td>
+            
             <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Chỉnh sửa</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Xem</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Xóa</a>
             </td>
         </tr>
 }
