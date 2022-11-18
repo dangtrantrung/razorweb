@@ -25,14 +25,14 @@ namespace razorweb.Pages_Blog
         {
             if (id == null)
             {
-                return NotFound();
+                return Content("Không tìm thấy bài viết");
             }
 
             Article = await _context.articles.FirstOrDefaultAsync(m => m.Id == id);
 
             if (Article == null)
             {
-                return NotFound();
+                return Content("Không tìm thấy bài viết");
             }
             return Page();
         }
@@ -41,7 +41,7 @@ namespace razorweb.Pages_Blog
         {
             if (id == null)
             {
-                return NotFound();
+                return Content("Không tìm thấy bài viết");
             }
 
             Article = await _context.articles.FindAsync(id);

@@ -4,10 +4,24 @@
 @{
     ViewData["Title"] = "Các bài viết";
     int i=0;
-    //Submit from get thì sẽ gử value input len querystring
+    //Submit form get thì sẽ gử value input len querystring
     // binding vao phuong thuc OnGetAsynce
+
 }
 
+
+@{
+   var pagingmodel= new XTL.Helpers.PagingModel()
+   { currentpage=Model.currentPage,
+   countpages=Model.countPages,
+   generateUrl=(int? p)=>Url.Page("/Blog/Index", new {p=p})
+
+   };
+
+}
+
+
+ <hr>
 <h1>DANH SÁCH BÀI VIẾT</h1>
 <form method="get" asp-page="./Index">
 <label> Tìm kiếm</label>
@@ -56,3 +70,5 @@
 }
     </tbody>
 </table>
+<hr>
+<partial name="_PagingXTL" model="@pagingmodel"></partial>
