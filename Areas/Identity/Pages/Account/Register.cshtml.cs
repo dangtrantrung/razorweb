@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using razorweb.models;
+using Aspose.Email;
+using System.IO; 
 
 namespace razorweb.Areas.Identity.Pages.Account
 {
@@ -75,8 +77,8 @@ namespace razorweb.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage ="Phải nhập {0}")]
+            [EmailAddress(ErrorMessage ="Sai định dạng {0}")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
@@ -85,9 +87,9 @@ namespace razorweb.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "{0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Mật khẩu")]
             public string Password { get; set; }
 
             /// <summary>
@@ -95,9 +97,16 @@ namespace razorweb.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Lặp lại mật khẩu")]
+            [Compare("Password", ErrorMessage = "Mật khẩu lặp lại không chính xác")]
             public string ConfirmPassword { get; set; }
+
+            [DataType(DataType.Text)]
+            [StringLength(50, ErrorMessage = "{0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+            [Required(ErrorMessage ="Phải nhập {0}")]
+            [Display(Name = "Tên tài khoản")]
+            public string UserName {get;set;}
+
         }
 
 
@@ -115,13 +124,13 @@ namespace razorweb.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("đÃ TẠO uSER MỚI.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -132,8 +141,37 @@ namespace razorweb.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Xác nhận email",
+                       $"Bạn đã đăng ký tk tại razorweb<a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>bẤM VÀO ĐÂY</a>.");
+                       
+                       // Get List eml files in mailsave
+                       string path=@"F:\razorweb\mailssave\";
+                       string[] filePaths = Directory.GetFiles(path);
+                      
+{
+    // code sử dụng stream (System.IO.Stream)
+}
+                        foreach (var filename in filePaths)
+                        {
+                             Console.WriteLine(filename);
+                            using (var stream = new FileStream(path:filename, mode: FileMode.Open, access: FileAccess.Read, share: FileShare.Read))
+                        
+                        {
+                            var message = MailMessage.Load(stream);
+                            message.Save(filename+".html", SaveOptions.DefaultHtml);  
+                            
+                        }
+                                             
+                        }
+                        /*  string[] filePaths1 = Directory.GetFiles(path);
+                         foreach (var item in filePaths1)
+                        {
+                            if(item.TakeLast(3).ToString()=="eml") System.IO.File.Delete(item); 
+                        } */
+                       // var filename =filePaths.FirstOrDefault().ToString();
+                       
+                       // Initialize and Load an existing EML file by specifying the MessageFormat
+                       
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

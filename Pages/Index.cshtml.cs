@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using razorweb.models;
-namespace razorweb.Pages;
+//using Microsoft.AspNetCore.Authorization;
 
+
+namespace razorweb.Pages{
 
 public class IndexModel : PageModel
 {
+    
     private readonly ILogger<IndexModel> _logger;
     private readonly MyBlogContext _myBlogContext;
     //public List<Article> list;
@@ -62,5 +65,6 @@ public void OnGet()
 } */
 }
 
+}
 // Phat sinh cac trang CRUD
 //dotnet aspnet-codegenerator razorpage -m razorweb.models.Article -dc razorweb.models.MyBlogContext -outDir Pages/Blog -udl --referenceScriptLibraries
