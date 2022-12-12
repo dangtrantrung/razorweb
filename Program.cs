@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using razorweb.models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-
+using App.Servicces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +81,16 @@ builder.Services.ConfigureApplicationCookie(options=>{
   options.AccessDeniedPath="/khongduoctruycap.html";
 });
 
+//Dang ky DI dich vụ Appservice AppIdentityErrorDescriber
+builder.Services.AddSingleton<IdentityErrorDescriber,AppIdentityErrorDescriber>();
+
+// Trên 30 giây truy cập lại sẽ nạp lại thông tin User (Role)
+// SecurityStamp trong bảng User đổi -> nạp lại thông tin Security
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -117,3 +127,9 @@ app.Run();
 // tu netcore 6.0 thi netcore da tich hop san identity version --6.0.0
 
 //dotnet aspnet-codegenerator identity -dc razorweb.models.MyBlogContext
+
+// Role based authorization (vai trò)
+//Role:admin,editor,manager,user members
+//Tạo các trang quản lý roles: index,create,eidt,delete,..role
+// dotnet new page -n Index -o Areas/Admin/Pages/Role -na App.Admin.Role
+//dotnet tool install -g Microsoft.Web.LibraryManager.Cli
