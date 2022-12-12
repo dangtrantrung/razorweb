@@ -3,10 +3,13 @@ using razorweb.models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Admin.Role
 {
-    [Authorize(Roles="Administrator")]  
+    //Policy Tao ra các policy->AllowEditRole (policy)
+    //[Authorize(Roles="Administrator")]  
+    [Authorize(Policy ="AllowEditRole")]
     public class EditModel : RolePageModel
     {
          public EditModel(RoleManager<IdentityRole> roleManager, MyBlogContext myBlogContext) : base(roleManager, myBlogContext)
@@ -24,6 +27,7 @@ namespace App.Admin.Role
                 {
                     Name=role.Name
                 };
+                Claims =await _myBlogContext.RoleClaims.Where(rc=>rc.RoleId==role.Id).ToListAsync();
                 return Page();
             }
            return NotFound("Không tìm thấy role");
@@ -40,10 +44,13 @@ namespace App.Admin.Role
         [BindProperty] // khi ng dùng submit nó sẽ bind form value vào property input này
         public InputModel Input{get;set;}
 
+        public List<IdentityRoleClaim<string>> Claims {get;set;}
+
         public async Task<IActionResult> OnPostAsync(string roleid)
         {
              if(roleid==null) return NotFound("Không tìm thấy role");
             var role=await _roleManager.FindByIdAsync(roleid);
+            Claims =await _myBlogContext.RoleClaims.Where(rc=>rc.RoleId==role.Id).ToListAsync();
             if(role==null) return NotFound("Không tìm thấy role");
             if(!ModelState.IsValid)
             {

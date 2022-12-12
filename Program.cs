@@ -4,6 +4,7 @@ using razorweb.models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using App.Servicces;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +92,36 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options =>
     options.ValidationInterval = TimeSpan.FromSeconds(30);
 });
 
+// Policy authorization
+builder.Services.AddAuthorization(options=>
+{
+    options.AddPolicy("AllowEditRole",policyBuilder=>
+    {
+            // Điều kiện của policy P1
+            policyBuilder.RequireAuthenticatedUser();
+            policyBuilder.RequireRole("Administrator");
+            policyBuilder.RequireRole("Editor");
+    });
+      options.AddPolicy("Policy P2",policyBuilder=>
+    {
+            // Điều kiện của policy
+            // Claims based authorization
+       /* policyBuilder.RequireClaim("TenClaim", new string[]
+       {
+          "gia tri 1",
+          "gia tri 2"
+       }); */
+    });
+
+     /* IdentityRoleClaim<string> claims1;
+     IdentityUserClaim<string> claims2;
+     Claim claim; */
+
+});
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -124,6 +155,7 @@ app.Run();
 //Identity/Account/Manage...
 
 // phat sinh cac trang Identity de customize
+
 // tu netcore 6.0 thi netcore da tich hop san identity version --6.0.0
 
 //dotnet aspnet-codegenerator identity -dc razorweb.models.MyBlogContext
@@ -133,3 +165,11 @@ app.Run();
 //Tạo các trang quản lý roles: index,create,eidt,delete,..role
 // dotnet new page -n Index -o Areas/Admin/Pages/Role -na App.Admin.Role
 //dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+
+//Policy based authorization
+//Claims based authorization
+
+  // claims là đặc tính của đối  tượng vd bằng lái B2 có uyền lái xe, trên bằng lái có các đặc tính : ngày sinh, nơi sinh, hộ khẩu,...
+
+  // policy {role, claims,...}
+
