@@ -42,6 +42,34 @@
             <button type="submit" class="btn btn-primary">Cập nhật</button>
             <a asp-page="./Index" class="btn btn-primary">Danh sách thành viên</a>
         </form>
+        <hr>
+        <p> Các Claim của user có được từ role:</p>
+        @if(Model.claimsInRole.Count>0)
+        {
+            <ul>
+                 @foreach (var cinrole in Model.claimsInRole)
+                 {
+                  <li> @cinrole.ClaimType : @cinrole.ClaimValue</li>   
+                 }
+
+            </ul>
+        }
+        <p> Các Claim riêng của user:
+        <a asp-page="./EditUserRoleClaim" asp-page-handler="AddClaim" asp-route-userid=@Model.user.Id> + Thêm claim riêng</a>
+        </p>
+        @if(Model.claimsInUserClaim.Count>0)
+        {
+            <ul>
+                 @foreach (var cinrole in Model.claimsInUserClaim)
+                 {
+                  <li> 
+                       <a asp-page="./EditUserRoleClaim" asp-page-handler="EditClaim" asp-route-claimid=@cinrole.Id>@cinrole.ClaimType : @cinrole.ClaimValue</a>
+                      
+                </li>   
+                 }
+
+            </ul>
+        }
     </div>
 </div>
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace razorweb.Migrations
+namespace App.Migrations
 {
     public partial class UpdateAppUser2 : Migration
     {

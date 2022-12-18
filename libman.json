@@ -3,16 +3,20 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "jquery@3.6.1",
+      "library": "multiple-select@1.2.3",
+      "destination": "wwwroot\\lib\\multiple-select"
+    },
+    {
+      "library": "jquery@3.3.1",
       "destination": "wwwroot\\lib\\jquery"
+    },
+    {
+      "library": "popper.js@1.14.7",
+      "destination": "wwwroot\\lib\\popper.js"
     },
     {
       "library": "bootstrap@5.2.3",
       "destination": "wwwroot\\lib\\bootstrap"
-    },
-    {
-      "library": "multiple-select@1.2.3",
-      "destination": "wwwroot\\lib\\multiple-select"
     }
   ]
 }

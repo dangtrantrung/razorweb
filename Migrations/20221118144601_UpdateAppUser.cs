@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace razorweb.Migrations
+namespace App.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateAppUser : Migration

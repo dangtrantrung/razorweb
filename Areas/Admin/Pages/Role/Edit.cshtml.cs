@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using razorweb.models;
+using App.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +12,7 @@ namespace App.Admin.Role
     [Authorize(Policy ="AllowEditRole")]
     public class EditModel : RolePageModel
     {
-         public EditModel(RoleManager<IdentityRole> roleManager, MyBlogContext myBlogContext) : base(roleManager, myBlogContext)
+         public EditModel(RoleManager<IdentityRole> roleManager, AppDbContext myBlogContext) : base(roleManager, myBlogContext)
         {
 
         }
@@ -20,7 +20,7 @@ namespace App.Admin.Role
         public async Task<IActionResult> OnGetAsync(string roleid)
         {
             if(roleid==null) return NotFound("Không tìm thấy role");
-            var role=await _roleManager.FindByIdAsync(roleid);
+            role=await _roleManager.FindByIdAsync(roleid);
             if(role!=null)
             {
                 Input= new InputModel()
@@ -49,7 +49,7 @@ namespace App.Admin.Role
         public async Task<IActionResult> OnPostAsync(string roleid)
         {
              if(roleid==null) return NotFound("Không tìm thấy role");
-            var role=await _roleManager.FindByIdAsync(roleid);
+            role=await _roleManager.FindByIdAsync(roleid);
             Claims =await _myBlogContext.RoleClaims.Where(rc=>rc.RoleId==role.Id).ToListAsync();
             if(role==null) return NotFound("Không tìm thấy role");
             if(!ModelState.IsValid)

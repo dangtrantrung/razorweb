@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-namespace razorweb.models
+namespace App.Models
 {
-    public class MyBlogContext:IdentityDbContext<AppUser>
+    public class AppDbContext:IdentityDbContext<AppUser>
     {
        
       //private const string connectstring ="Data Source=DTTRUNG-PC\\SQLEXPRESS;Initial Catalog=RAZORWEBDB;User ID=sa;Password=tr";
-      public MyBlogContext (DbContextOptions<MyBlogContext> options):base(options)
+      public AppDbContext (DbContextOptions<AppDbContext> options):base(options)
       {
           // option se dc DI inject
         

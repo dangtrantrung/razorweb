@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Bogus;
-using razorweb.models;
+using App.Models;
 
 #nullable disable
 
-namespace razorweb.Migrations
+namespace App.Migrations
 {
     /// <inheritdoc />
     public partial class initdb : Migration

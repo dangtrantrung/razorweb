@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using razorweb.models;
+using App.Models;
 
 namespace App.Admin.User
 {
@@ -20,15 +20,18 @@ namespace App.Admin.User
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AppDbContext _context;
 
         public AddRoleModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager=roleManager;
+            _context=context;
         }
 
         /// <summary>
@@ -46,6 +49,9 @@ namespace App.Admin.User
         public string[] RoleNames{get;set;}
 
         public SelectList allRoles{get;set;}
+        //Hiển thị thêm 2 loại claim của user
+        public List<IdentityRoleClaim<string>> claimsInRole{get;set;}
+        public List<IdentityUserClaim<string>> claimsInUserClaim{get;set;}
 
 
         public async Task<IActionResult> OnGetAsync(string id)
@@ -62,7 +68,32 @@ namespace App.Admin.User
             RoleNames= (await _userManager.GetRolesAsync(user)).ToArray<string>();
             List<string> roleNames= await _roleManager.Roles.Select(r=>r.Name).ToListAsync();
             allRoles=new SelectList(roleNames);
+            await GetClaims(id);
+           
             return Page();
+        }
+
+        async Task GetClaims(string id )
+        {
+             var listRoles =from r in _context.Roles
+                          join ur in _context.UserRoles on r.Id equals ur.RoleId
+                          where ur.UserId==id
+                            select r;
+
+            var _claimsInRole= from c in _context.RoleClaims
+                                join r in listRoles on c.RoleId equals r.Id
+                                select c;
+
+                claimsInRole = await _claimsInRole.ToListAsync();
+
+                //select claims from user claims table in context
+        claimsInUserClaim= await 
+        (from c in _context.UserClaims
+        where c.UserId==id 
+        select c).ToListAsync();
+
+
+
         }
 
         public async Task<IActionResult> OnPostAsync(string id)
@@ -79,6 +110,7 @@ namespace App.Admin.User
             }
 
             //RoleNames is new roles, and we must delete or add from oldrolesname
+            await GetClaims(id);
 
             var OldRoleNames=(await _userManager.GetRolesAsync(user)).ToArray();
             var deleteRoles=OldRoleNames.Where(r=>!RoleNames.Contains(r));

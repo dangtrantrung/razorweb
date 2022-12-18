@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 //using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using razorweb.models;
+using App.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using App.Servicces;
 using System.Security.Claims;
+using App.Security.Requirements;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,7 @@ builder.Services.AddSingleton<IEmailSender,SendMailService>();
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<MyBlogContext>(options=>{
+builder.Services.AddDbContext<AppDbContext>(options=>{
 
 string connectstring=builder.Configuration.GetConnectionString("MyBlogContext");
 options.UseSqlServer(connectstring);
@@ -40,7 +42,7 @@ options.UseSqlServer(connectstring);
             var identityservice = builder.Services.AddIdentity<AppUser, IdentityRole>();
 
 // Thêm triển khai EF lưu trữ thông tin về Idetity (theo AppDbContext -> MS SQL Server).
-identityservice.AddEntityFrameworkStores<MyBlogContext>();
+identityservice.AddEntityFrameworkStores<AppDbContext>();
 
 // Thêm Token Provider - nó sử dụng để phát sinh token (reset password, confirm email ...)
 // đổi email, số điện thoại ...
@@ -99,10 +101,23 @@ builder.Services.AddAuthorization(options=>
     {
             // Điều kiện của policy P1
             policyBuilder.RequireAuthenticatedUser();
-            policyBuilder.RequireRole("Administrator");
-            policyBuilder.RequireRole("Editor");
+            /* policyBuilder.RequireRole("Administrator");
+            policyBuilder.RequireRole("Editor"); */
+            // Điều kiện của policy
+            // Claims based authorization
+       /* policyBuilder.RequireClaim("manage.role", new string[]
+       {
+          "add",
+          "update"
+       });  */
+        policyBuilder.RequireClaim("canedit", new string[]
+       {
+          "user",
+         
+       }); 
     });
-      options.AddPolicy("Policy P2",policyBuilder=>
+
+   /*    options.AddPolicy("Policy P2",policyBuilder=>
     {
             // Điều kiện của policy
             // Claims based authorization
@@ -110,15 +125,42 @@ builder.Services.AddAuthorization(options=>
        {
           "gia tri 1",
           "gia tri 2"
-       }); */
-    });
+       }); 
+    }); 
+    */
 
      /* IdentityRoleClaim<string> claims1;
      IdentityUserClaim<string> claims2;
      Claim claim; */
 
+     options.AddPolicy("InGenZ",policyBuilder=>
+    {
+        policyBuilder.RequireAuthenticatedUser();
+        policyBuilder.Requirements.Add(new GenZRequirement());
+        // cần phải xd service để xử lý, kiểm tra GenZRequirement (Authorization service handler)
+
+
+    });
+     options.AddPolicy("ShowAdminMenu",policyBuilder=>
+    {
+        policyBuilder.RequireRole("Administrator");
+        
+
+    });
+    options.AddPolicy("CanUpdateArticle",policyBuilder=>
+    {
+        //policyBuilder.RequireRole("Administrator");
+        policyBuilder.Requirements.Add(new ArticleUpdateRequirement());
+        
+
+    });
+
 });
 
+//builder.Services.AddSingleton<IAuthorizationHandler,AppAuthorizationHandler>();
+
+// phải đăng ký dịch vụ kiểu transient >=để tạo ra handler mới cho mỗi truy vấn - request
+builder.Services.AddTransient<IAuthorizationHandler,AppAuthorizationHandler>();
 
 
 
@@ -172,4 +214,6 @@ app.Run();
   // claims là đặc tính của đối  tượng vd bằng lái B2 có uyền lái xe, trên bằng lái có các đặc tính : ngày sinh, nơi sinh, hộ khẩu,...
 
   // policy {role, claims,...}
+
+  //dotnet new page -n EditUserRoleClaim -o Areas/Admin/Pages/User -na App.Admin.User
 
